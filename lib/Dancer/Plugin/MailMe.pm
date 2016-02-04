@@ -21,14 +21,6 @@ use Encode qw( encode );
 my $smtp;
 
 
-sub send {
-    my ( $recipient, $subject, $template, $template_data ) = @_;
-    my $doup = config->{plugins}->{Email}->{techdir};
-    my $message = template_process($template, $template_data);
-    $recipient = config->{plugins}->{MailMe}->{alias}->{$recipient} ? config->{plugins}->{MailMe}->{alias}->{$recipient} : $recipient;
-};
-
-
 =head2 recode
 
 Переводит указанное сообщение в формат Base64:UTF-8 и удаляет завершающий перенос строки
@@ -82,16 +74,16 @@ sub mail_disconnect {
 
 sub mail_send {
     my ( $to, $subject, $body ) = @_;
+    my $config = config->{plugins}->{MailMe};
+    my $boundary = localtime;
     
     $subject    = recode($subject);
     $body       = recode($body);
     
-    my $boundary = localtime;
-    
-    $smtp->mail('mail@simple-ip.ru');
+    $smtp->mail($config->{sender});
     $smtp->recipient("$to\n");
     $smtp->data();
-    $smtp->datasend("From: mail\@simple-ip.ru\n");
+    $smtp->datasend("From: ". $config->{sender} ."\n");
     $smtp->datasend("To: $to\n");
     $smtp->datasend("Subject: =?UTF-8?B?$subject?=\n");
     $smtp->datasend("Content-Type: multipart/mixed; boundary=\"$boundary\"\n");
