@@ -1,4 +1,5 @@
 package Dancer::Plugin::MailMe;
+# ABSTRACT: send email module
 
 use strict;
 use warnings;
